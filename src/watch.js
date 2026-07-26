@@ -222,7 +222,7 @@ async function main() {
         "",
         formatAvailable(available),
         "",
-        `予約サイト: ${TOP_URL}`,
+        `<${TOP_URL}|予約サイト>`,
       ].join("\n");
       await notifySlack(msg);
       state.lastFingerprint = fp;
@@ -231,10 +231,13 @@ async function main() {
       log("Slack通知済み");
     } catch (e) {
       log("チェック失敗:", e.message || e);
-      // CI では毎回エラー通知すると迷惑なのでログのみ。ローカル常駐時だけ Slack へ
+      // ローカル常駐時はここで通知。CI は workflow の failure ステップで通知
       if (!IS_CI) {
-        await notifySlack(`空き枠監視エラー: ${e.message || e}`).catch(() => {});
+        await notifySlack(
+          `${SLACK_MENTION}\n空き枠監視エラー: ${e.message || e}\n<${TOP_URL}|予約サイト>`
+        ).catch(() => {});
       }
+      if (ONCE) throw e;
     }
   };
 

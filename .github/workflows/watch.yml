@@ -47,3 +47,26 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           TARGET_DATE: "2026/08/09"
+
+      - name: Notify Slack on failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          text = (
+              "<@U05QLS5V34N>\n"
+              "【監視エラー】高千穂峡ボート空き監視が失敗しました\n"
+              f"ログ: {os.environ['RUN_URL']}\n"
+              "<https://eipro.jp/takachiho1/terms/view/toppage|予約サイト>"
+          )
+          req = urllib.request.Request(
+              os.environ["SLACK_WEBHOOK_URL"],
+              data=json.dumps({"text": text}).encode(),
+              headers={"Content-Type": "application/json"},
+          )
+          with urllib.request.urlopen(req) as res:
+              print(res.status, res.read().decode())
+          PY
