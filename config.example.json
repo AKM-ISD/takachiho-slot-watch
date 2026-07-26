@@ -1,0 +1,5 @@
+{
+  "targetDate": "2026/08/09",
+  "checkIntervalMs": 900000,
+  "slackWebhookUrl": "https://hooks.slack.com/services/REPLACE/WITH/YOUR_WEBHOOK"
+}

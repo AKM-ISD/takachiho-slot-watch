@@ -1,0 +1,49 @@
+name: Slot Watch
+
+on:
+  schedule:
+    # 15分ごと（UTC）。日本時間でも同間隔で動く
+    - cron: "*/15 * * * *"
+  workflow_dispatch: # GitHub画面から手動実行用
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Cache Playwright browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Install Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Restore notify state
+        uses: actions/cache@v4
+        with:
+          path: .watch-state.json
+          key: watch-state-${{ github.run_id }}
+          restore-keys: |
+            watch-state-
+
+      - name: Check availability
+        run: npm run check
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TARGET_DATE: "2026/08/09"

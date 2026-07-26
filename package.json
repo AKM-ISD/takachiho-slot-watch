@@ -1,0 +1,13 @@
+{
+  "name": "takachiho-slot-watch",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/watch.js",
+    "check": "node src/watch.js --once"
+  },
+  "dependencies": {
+    "playwright": "^1.62.0"
+  }
+}
