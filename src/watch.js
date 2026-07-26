@@ -10,6 +10,7 @@ const STATE_PATH = path.join(ROOT, ".watch-state.json");
 const TOP_URL = "https://eipro.jp/takachiho1/terms/view/toppage";
 const CALENDAR_URL = "https://eipro.jp/takachiho1/eventCalendars/index";
 const IS_CI = process.env.GITHUB_ACTIONS === "true" || process.env.CI === "true";
+const SLACK_MENTION = "<@U05QLS5V34N>";
 
 function loadConfig() {
   if (fs.existsSync(CONFIG_PATH)) {
@@ -216,6 +217,7 @@ async function main() {
         return;
       }
       const msg = [
+        `${SLACK_MENTION}`,
         `【空き枠あり】高千穂峡貸しボート ${TARGET_DATE}`,
         "",
         formatAvailable(available),
